@@ -30,8 +30,8 @@
 
 | 软件 | 用途 | 下载地址 |
 |------|------|----------|
-| **Go 1.21+** | 运行后端代码 | https://go.dev/dl/ |
-| **Node.js 18+** | 运行前端代码 | https://nodejs.org/zh-cn/ |
+| **Go 1.25+** | 运行后端代码（`go.mod` 要求 1.25.0） | https://go.dev/dl/ |
+| **Node.js 20.19+** | 运行前端代码（Vite 8 需要） | https://nodejs.org/zh-cn/ |
 | **MySQL 8.0** | 数据库 | https://dev.mysql.com/downloads/installer/ |
 | **Redis 7.0** | 缓存服务 | https://redis.io/download/ （Windows 用 https://github.com/tporadowski/redis/releases） |
 | **Git** | 下载代码 | https://git-scm.com/downloads |
@@ -326,7 +326,7 @@ yarn dev
 看到类似下面的输出，表示前端启动成功：
 
 ```
-  VITE v6.x.x  ready in xxx ms
+  VITE v8.x.x  ready in xxx ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: http://xxx.xxx.xxx.xxx:5173/
@@ -407,6 +407,14 @@ http://localhost:5173
 go env -w GOPROXY=https://goproxy.cn,direct
 go mod tidy
 ```
+
+---
+
+### ❓ 问题：执行 `go mod tidy` 或 `go run` 提示 Go 版本过低
+
+**原因**：项目的 `go.mod` 要求 `go 1.25.0`，本机 Go 版本太低。
+
+**解决方法**：升级 Go 到 1.25 或更高版本后重试（可用 `go version` 检查）。
 
 ---
 
