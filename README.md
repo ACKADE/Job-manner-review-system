@@ -250,12 +250,30 @@ AI:
 RateLimit:
   TokensPerSecond: 100
   Burst: 200
+
+CircuitBreaker:
+  ForceOpen: false
+  SleepWindow: 5000
+  ErrorPercentThreshold: 50
+
+CORS:
+  Origins:
+    - http://localhost:5173
+  Methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  Headers:
+    - "*"
 ```
 
 > ⚠️ **注意事项：**
 > - `your_password` → 改成你 MySQL 的 root 密码
 > - `change-this-to-a-random-secret-string-abcdef123456` → 改成任意一串随机字符（越复杂越好）
 > - `sk-your-deepseek-api-key-here` → 改成你的 DeepSeek API Key
+> - 上面的模板已经补齐后端启动所需的关键配置块，建议整段复制后再改值，避免反复出现 `field "... is not set"` 报错
 
 ---
 
@@ -483,6 +501,43 @@ CacheRedis:
   Pass: ""
   DB: 0
   PoolSize: 100
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "CircuitBreaker" is not set`
+
+**原因**：`etc/career-api.yaml` 缺少 `CircuitBreaker` 配置块。
+
+**解决方法**：补齐以下内容后重启：
+
+```yaml
+CircuitBreaker:
+  ForceOpen: false
+  SleepWindow: 5000
+  ErrorPercentThreshold: 50
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "CORS" is not set`
+
+**原因**：`etc/career-api.yaml` 缺少 `CORS` 配置块。
+
+**解决方法**：补齐以下内容后重启：
+
+```yaml
+CORS:
+  Origins:
+    - http://localhost:5173
+  Methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  Headers:
+    - "*"
 ```
 
 ---
