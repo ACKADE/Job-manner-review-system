@@ -222,11 +222,17 @@ Mysql:
 
 Redis:
   Host: localhost:6379
+  # 如果 Redis 没有密码，也必须显式填写空字符串
+  Pass: ""
   Type: node
+  DB: 0
+  PoolSize: 100
 
 CacheRedis:
-  - Host: localhost:6379
-    Type: node
+  Host: localhost:6379
+  Pass: ""
+  DB: 0
+  PoolSize: 100
 
 Auth:
   # 这是用于生成登录 Token 的密钥，可以随意填写一串字符，但要保密
@@ -244,12 +250,30 @@ AI:
 RateLimit:
   TokensPerSecond: 100
   Burst: 200
+
+CircuitBreaker:
+  ForceOpen: false
+  SleepWindow: 5000
+  ErrorPercentThreshold: 50
+
+CORS:
+  Origins:
+    - http://localhost:5173
+  Methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  Headers:
+    - "*"
 ```
 
 > ⚠️ **注意事项：**
 > - `your_password` → 改成你 MySQL 的 root 密码
 > - `change-this-to-a-random-secret-string-abcdef123456` → 改成任意一串随机字符（越复杂越好）
 > - `sk-your-deepseek-api-key-here` → 改成你的 DeepSeek API Key
+> - 上面的模板已经补齐后端启动所需的关键配置块，建议整段复制后再改值，避免反复出现 `field "... is not set"` 报错
 
 ---
 
@@ -454,6 +478,66 @@ Mysql:
   MaxOpenConns: 100
   MaxIdleConns: 10
   ConnMaxLifetime: 3600
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "Redis.Pass" is not set`
+
+**原因**：`etc/career-api.yaml` 中 `Redis`/`CacheRedis` 缺少必填 `Pass` 字段（即使没有密码也要写）。
+
+**解决方法**：补齐以下字段后重启：
+
+```yaml
+Redis:
+  Host: localhost:6379
+  Pass: ""
+  Type: node
+  DB: 0
+  PoolSize: 100
+
+CacheRedis:
+  Host: localhost:6379
+  Pass: ""
+  DB: 0
+  PoolSize: 100
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "CircuitBreaker" is not set`
+
+**原因**：`etc/career-api.yaml` 缺少 `CircuitBreaker` 配置块。
+
+**解决方法**：补齐以下内容后重启：
+
+```yaml
+CircuitBreaker:
+  ForceOpen: false
+  SleepWindow: 5000
+  ErrorPercentThreshold: 50
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "CORS" is not set`
+
+**原因**：`etc/career-api.yaml` 缺少 `CORS` 配置块。
+
+**解决方法**：补齐以下内容后重启：
+
+```yaml
+CORS:
+  Origins:
+    - http://localhost:5173
+  Methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+  Headers:
+    - "*"
 ```
 
 ---
