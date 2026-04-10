@@ -213,6 +213,12 @@ Mysql:
   # 格式：用户名:密码@tcp(地址:端口)/数据库名?参数
   # 将 your_password 替换为你的 MySQL root 密码
   DataSource: root:your_password@tcp(localhost:3306)/career_db?charset=utf8mb4&parseTime=true&loc=Local
+  # 必填：最大打开连接数
+  MaxOpenConns: 100
+  # 必填：最大空闲连接数
+  MaxIdleConns: 10
+  # 必填：连接最大生命周期（秒）
+  ConnMaxLifetime: 3600
 
 Redis:
   Host: localhost:6379
@@ -428,6 +434,22 @@ go mod tidy
 
 ---
 
+### ❓ 问题：启动后端时提示 `field "Mysql.MaxOpenConns" is not set`
+
+**原因**：`etc/career-api.yaml` 的 `Mysql` 配置不完整，缺少必填连接池参数。
+
+**解决方法**：在 `Mysql` 下补齐以下字段后重启：
+
+```yaml
+Mysql:
+  DataSource: root:your_password@tcp(localhost:3306)/career_db?charset=utf8mb4&parseTime=true&loc=Local
+  MaxOpenConns: 100
+  MaxIdleConns: 10
+  ConnMaxLifetime: 3600
+```
+
+---
+
 ### ❓ 问题：前端页面打开后，操作没有反应或显示"网络请求失败"
 
 **原因**：后端服务没有启动，或者后端启动失败
@@ -521,4 +543,3 @@ Job-manner-review-system/
 | 数据库 | MySQL 8.0 |
 | 缓存 | Redis 7 |
 | AI 服务 | DeepSeek API |
-
