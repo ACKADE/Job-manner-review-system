@@ -183,4 +183,93 @@ export const hollandApi = {
     api.get<{ code: number; msg: string; data: import('../types').HollandHistoryData }>('/holland/history', { params }),
 };
 
+export const interviewApi = {
+  start: (data: { mode: 'practice' | 'assessment'; studentId?: number }) =>
+    api.post<{ code: number; msg: string; data: import('../types').InterviewSession }>('/interview/start', data),
+  
+  chatStream: async (data: { sessionId: number; message: string }, onEvent: (event: { type: string; data: any }) => void, onError: (error: Error) => void) => {
+    const token = localStorage.getItem('token');
+    
+    try {
+      const response = await fetch(`${BASE_URL}/interview/chat-stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'text/event-stream',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error('Response body is null');
+      }
+
+      let buffer = '';
+      let currentEventType = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          break;
+        }
+
+        buffer += decoder.decode(value, { stream: true });
+        
+        // 处理SSE事件
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (trimmedLine === '') continue;
+
+          // 处理event行，记录事件类型
+          if (trimmedLine.startsWith('event: ')) {
+            currentEventType = trimmedLine.substring(7);
+            continue;
+          }
+
+          // 处理data行，发送事件
+          if (trimmedLine.startsWith('data: ')) {
+            const data = trimmedLine.substring(6);
+            try {
+              const parsedData = JSON.parse(data);
+              onEvent({ type: currentEventType || 'data', data: parsedData });
+              currentEventType = ''; // 重置事件类型
+            } catch (e) {
+              console.error('Failed to parse SSE data:', e);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      onError(error as Error);
+    }
+  },
+  
+  getHistory: (params?: { page?: number; pageSize?: number; status?: string; mode?: string }) =>
+    api.get<{ code: number; msg: string; data: import('../types').InterviewHistoryResult }>('/interview/history', { params }),
+  
+  getDetail: (id: number) =>
+    api.get<{ code: number; msg: string; data: import('../types').InterviewDetail }>(`/interview/${id}`),
+  
+  getReport: (id: number) =>
+    api.get<{ code: number; msg: string; data: import('../types').InterviewReport }>(`/interview/${id}/report`),
+  
+  end: (id: number, reason: 'user_completed' | 'timeout' | 'cancelled') =>
+    api.post<{ code: number; msg: string; data: import('../types').EndInterviewData }>(`/interview/${id}/end`, { reason }),
+  
+  delete: (id: number) =>
+    api.delete<{ code: number; msg: string }>(`/interview/${id}`),
+};
+
 export default api;

@@ -9,11 +9,15 @@ import AuthPage from './pages/Auth';
 import HollandTestPage from './pages/Holland';
 import HollandResultPage from './pages/Holland/Result';
 import HollandHistoryPage from './pages/Holland/History';
+import InterviewPage from './pages/Interview';
 import ProtectedRoute from './components/ProtectedRoute';
+import GlobalBackground from './components/GlobalBackground';
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <GlobalBackground />
+      <Routes>
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/" element={
         <ProtectedRoute>
@@ -41,7 +45,13 @@ export default function App() {
           <HollandHistoryPage />
         </ProtectedRoute>
       } />
+      <Route path="/interview" element={
+        <ProtectedRoute>
+          <InterviewPage />
+        </ProtectedRoute>
+      } />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }
