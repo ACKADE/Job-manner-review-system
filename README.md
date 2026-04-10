@@ -222,11 +222,17 @@ Mysql:
 
 Redis:
   Host: localhost:6379
+  # 如果 Redis 没有密码，也必须显式填写空字符串
+  Pass: ""
   Type: node
+  DB: 0
+  PoolSize: 100
 
 CacheRedis:
-  - Host: localhost:6379
-    Type: node
+  Host: localhost:6379
+  Pass: ""
+  DB: 0
+  PoolSize: 100
 
 Auth:
   # 这是用于生成登录 Token 的密钥，可以随意填写一串字符，但要保密
@@ -454,6 +460,29 @@ Mysql:
   MaxOpenConns: 100
   MaxIdleConns: 10
   ConnMaxLifetime: 3600
+```
+
+---
+
+### ❓ 问题：启动后端时提示 `field "Redis.Pass" is not set`
+
+**原因**：`etc/career-api.yaml` 中 `Redis`/`CacheRedis` 缺少必填 `Pass` 字段（即使没有密码也要写）。
+
+**解决方法**：补齐以下字段后重启：
+
+```yaml
+Redis:
+  Host: localhost:6379
+  Pass: ""
+  Type: node
+  DB: 0
+  PoolSize: 100
+
+CacheRedis:
+  Host: localhost:6379
+  Pass: ""
+  DB: 0
+  PoolSize: 100
 ```
 
 ---
