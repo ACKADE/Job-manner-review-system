@@ -30,8 +30,8 @@
 
 | 软件 | 用途 | 下载地址 |
 |------|------|----------|
-| **Go 1.21+** | 运行后端代码 | https://go.dev/dl/ |
-| **Node.js 18+** | 运行前端代码 | https://nodejs.org/zh-cn/ |
+| **Go 1.25+** | 运行后端代码（`go.mod` 要求 1.25.0） | https://go.dev/dl/ |
+| **Node.js 20.19+** | 运行前端代码（Vite 8 需要） | https://nodejs.org/zh-cn/ |
 | **MySQL 8.0** | 数据库 | https://dev.mysql.com/downloads/installer/ |
 | **Redis 7.0** | 缓存服务 | https://redis.io/download/ （Windows 用 https://github.com/tporadowski/redis/releases） |
 | **Git** | 下载代码 | https://git-scm.com/downloads |
@@ -213,6 +213,12 @@ Mysql:
   # 格式：用户名:密码@tcp(地址:端口)/数据库名?参数
   # 将 your_password 替换为你的 MySQL root 密码
   DataSource: root:your_password@tcp(localhost:3306)/career_db?charset=utf8mb4&parseTime=true&loc=Local
+  # 必填：最大打开连接数
+  MaxOpenConns: 100
+  # 必填：最大空闲连接数
+  MaxIdleConns: 10
+  # 必填：连接最大生命周期（秒）
+  ConnMaxLifetime: 3600
 
 Redis:
   Host: localhost:6379
@@ -320,7 +326,7 @@ yarn dev
 看到类似下面的输出，表示前端启动成功：
 
 ```
-  VITE v6.x.x  ready in xxx ms
+  VITE v8.x.x  ready in xxx ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: http://xxx.xxx.xxx.xxx:5173/
@@ -404,6 +410,14 @@ go mod tidy
 
 ---
 
+### ❓ 问题：执行 `go mod tidy` 或 `go run` 提示 Go 版本过低
+
+**原因**：项目的 `go.mod` 要求 `go 1.25.0`，本机 Go 版本太低。
+
+**解决方法**：升级 Go 到 1.25 或更高版本后重试（可用 `go version` 检查）。
+
+---
+
 ### ❓ 问题：启动后端时提示 `dial tcp 127.0.0.1:3306: connect: connection refused`
 
 **原因**：MySQL 没有运行
@@ -425,6 +439,22 @@ go mod tidy
 **原因**：配置文件中的 MySQL 密码不对
 
 **解决方法**：检查并修改 `etc/career-api.yaml` 中 `DataSource` 里的密码
+
+---
+
+### ❓ 问题：启动后端时提示 `field "Mysql.MaxOpenConns" is not set`
+
+**原因**：`etc/career-api.yaml` 的 `Mysql` 配置不完整，缺少必填连接池参数。
+
+**解决方法**：在 `Mysql` 下补齐以下字段后重启：
+
+```yaml
+Mysql:
+  DataSource: root:your_password@tcp(localhost:3306)/career_db?charset=utf8mb4&parseTime=true&loc=Local
+  MaxOpenConns: 100
+  MaxIdleConns: 10
+  ConnMaxLifetime: 3600
+```
 
 ---
 
@@ -521,4 +551,3 @@ Job-manner-review-system/
 | 数据库 | MySQL 8.0 |
 | 缓存 | Redis 7 |
 | AI 服务 | DeepSeek API |
-
