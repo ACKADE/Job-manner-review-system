@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM.Iterable", "DOM"],
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+
+    // so that if your project isn't using TypeScript, it still has autocomplete
+    "allowJs": true,
+    "strict": true,
+    "jsx": "preserve",
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true
+  },
+  "exclude": [
+    "postcss.config.js",
+    "tailwind.config.js"
+  ]
+}
